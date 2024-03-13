@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	let bombAmount = 20
 	let squares = []
 	let isGameOver = false
+	let flags = 0
 
 	// Create Board
 	const createBoard = () => {
@@ -31,8 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
 			})
 
 			//control and left click
-			square.addEventListener('click', () => {
-				// addFlag(square)
+			square.addEventListener('contextmenu', () => {
+				addFlag(square)
 			})
 		}
 
@@ -57,6 +58,25 @@ document.addEventListener("DOMContentLoaded", () => {
 	}
 
 	createBoard()
+
+	// add Flag with right click
+	const addFlag = (square) => {
+		if(isGameOver) return
+		if(!square.classList.contains('checked') && (flags < bombAmount)) {
+			if (!square.classList.contains('flag')) {
+				square.classList.add('flag')
+				flags ++
+				square.innerHTML = '🚩'
+				flagsLeft.innerHTML = bombAmount - flags
+				checkWin()
+			} else {
+				square.classList.remove('flag')
+				flags -- 
+				square.innerHTML = ''
+				flagsLeft.innerHTML = bombAmount - flags
+			}
+		}
+	}
 
 	const click = (square) => {
 		if (isGameOver || square.classList.contains('checked') || square.classList.contains('flag')) return
@@ -128,6 +148,18 @@ document.addEventListener("DOMContentLoaded", () => {
 			}
 
 		}, 10)
+	}
+
+	const checkWin = () => {
+		let matches = 0
+		for (let i = 0; i < squares.length; i++) {
+			if (squares[i].classList.contains('flag') &&
+			squares[i].classList.contains('bomb')) matches ++
+			if (matches === bombAmount) {
+				result.innerHTML = 'YOU WIN!'
+				isGameOver = true
+			}
+		}
 	}
 
 	const gameOver = () => {
